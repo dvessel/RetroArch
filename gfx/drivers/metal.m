@@ -5276,7 +5276,16 @@ typedef struct MTLALIGN(16)
       memset(&_engine.pass[i].feedback, 0, sizeof(_engine.pass[i].feedback));
    }
 
-   _engine.mvp_last_pass = _context.uniformsNoRotate->projectionMatrix;
+   if (@available(macOS 27.0, iOS 27.0, tvOS 27.0, *))
+   {
+      // Metal 4.1 rotation bug #19142
+      _engine.mvp_last_pass = _context.uniforms->projectionMatrix;
+   }
+   else
+   {
+      // Metal 4 and below.
+      _engine.mvp_last_pass = _context.uniformsNoRotate->projectionMatrix;
+   }
    int rot = retroarch_get_rotation();
    
    width  = (NSUInteger)_size.width;
